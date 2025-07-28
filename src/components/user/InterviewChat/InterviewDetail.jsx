@@ -154,18 +154,39 @@ export default function InterviewChat() {
 
     const lastMessage = messages[messages.length - 1];
 
-    if (
-      messages.length > prevMessageCount.current &&
-      lastMessage?.sender === "ai"
-    ) {
-      addToQueue(lastMessage);
-      followUpTriggered.current = false;
+    // if (
+    //   messages.length > prevMessageCount.current &&
+    //   lastMessage?.sender === "ai"
+    // ) {
+    //   addToQueue(lastMessage);
+    //   followUpTriggered.current = false;
 
-      if (lastMessage.isConclusion) {
-        stopRecording();
-        clearQueue();
-      }
-    }
+    //   if (lastMessage.isConclusion) {
+    //     stopRecording();
+    //     clearQueue();
+    //   }
+    // }
+
+    if (
+  messages.length > prevMessageCount.current &&
+  lastMessage?.sender === "ai"
+) {
+  // NEW: Split into sentences
+  const parts = lastMessage.text
+    .split(/(?<=[.?!])\s+(?=[A-Z])/)
+    .filter(Boolean);
+
+  parts.forEach((part) => {
+    addToQueue({ ...lastMessage, text: part });
+  });
+
+  followUpTriggered.current = false;
+
+  if (lastMessage.isConclusion) {
+    stopRecording();
+    clearQueue();
+  }
+}
 
     prevMessageCount.current = messages.length;
   }, [messages, addToQueue, stopRecording, clearQueue]);
