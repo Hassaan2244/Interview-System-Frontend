@@ -55,8 +55,11 @@ const JobList = ({ darkMode, setDrawerOpen }) => {
   const descriptionRef = useRef(null);
   const requirementsRef = useRef(null);
   const responsibilitiesRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [jobLoading , setJobLoading] = useState(false);
 
   const fetchJobs = async () => {
+    setJobLoading(true);
     try {
       const response = await getJobs();
       const jobsData = response?.data?.jobs || [];
@@ -64,6 +67,8 @@ const JobList = ({ darkMode, setDrawerOpen }) => {
       setFilteredJobs(jobsData);
     } catch (err) {
       console.error("Error fetching jobs:", err);
+    }finally {
+      setJobLoading(false);
     }
   };
 
@@ -124,6 +129,7 @@ const JobList = ({ darkMode, setDrawerOpen }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const formattedJob = {
         ...formData,
@@ -144,7 +150,9 @@ const JobList = ({ darkMode, setDrawerOpen }) => {
       setDrawerOpen(false);
     } catch (error) {
       console.error("Error saving job:", error);
-    }
+    }finally {
+    setIsLoading(false); 
+  }
   };
 
   const handleInputChange = (e) => {
@@ -181,6 +189,15 @@ const JobList = ({ darkMode, setDrawerOpen }) => {
       }, 0);
     }
   }, [isModalOpen]);
+
+  if (jobLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+        <p className="text-lg text-gray-700">Loading Jobs!! Please wait...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -515,12 +532,24 @@ const JobList = ({ darkMode, setDrawerOpen }) => {
             <button
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              disabled={isLoading}
             >
               {editingJobId ? "Update Job" : "Create Job"}
             </button>
           </div>
         </form>
       </Drawer>
+
+      <Modal
+  isOpen={isLoading}
+  onClose={() => {}} 
+  title="Creating Job..."
+>
+  <div className="flex flex-col items-center justify-center py-8">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+    <p className="text-lg text-gray-700">Please wait while the job is being created...</p>
+  </div>
+</Modal>
 
       <Modal
         isOpen={confirmDeleteOpen}

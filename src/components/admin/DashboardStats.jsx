@@ -8,6 +8,7 @@ import useGetJobApplications from "../../hooks/admin/useGetJobApplications";
 const DashboardStats = () => {
   const { getJobs } = useGetJobs();
   const { getJobApplications } = useGetJobApplications();
+  const [loading, setLoading] = useState(false);
 
   const [stats, setStats] = useState({
     totalJobs: 0,
@@ -20,6 +21,7 @@ const DashboardStats = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const jobList = await getJobs();
         const jobArray = jobList?.data?.jobs || [];
@@ -80,6 +82,8 @@ const DashboardStats = () => {
         setRecentJobs(recJobs);
       } catch (err) {
         console.error("Error fetching dashboard stats:", err);
+      }finally{
+        setLoading(false);
       }
     };
 
@@ -113,6 +117,15 @@ const DashboardStats = () => {
     },
    
   ];
+
+  if (loading) {
+  return (
+    <div className="flex flex-col items-center justify-center py-20">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+      <p className="text-lg text-gray-700">Loading dashboard data...</p>
+    </div>
+  );
+}
 
   return (
     <div className="space-y-8">

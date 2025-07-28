@@ -157,14 +157,12 @@ const ApplicantsList = () => {
               onChange={(e) => setSelectedJobId(e.target.value)}
               className="flex-1 h-10 px-3 py-2 rounded-md border bg-white dark:bg-gray-800 text-sm"
             >
-              <option value="" disabled>
-                Select a job
-              </option>
-              {jobs.map((job) => (
+              
+              {jobs?.map((job) => (
                 <option key={job.id} value={job.id}>
                   {job.title}
                 </option>
-              ))}
+              )) }
             </select>
           </div>
         </div>
